@@ -1,8 +1,10 @@
-version: '1'
+version: '3'
 
 services:
   db:
     image: postgres
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: postgres_db
       POSTGRES_USER: admin
@@ -12,7 +14,7 @@ services:
     build:
       context: .
       dockerfile: ./resources/docker/Dockerfile
-    command: python manage.py runserver
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
@@ -24,3 +26,6 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: postgres_db
       POSTGRES_HOST: db
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_SUPERUSER_USERNAME: admin

@@ -14,4 +14,20 @@ RUN pipenv install --system --deploy
 
 COPY . /app/
 
-CMD ["python", "manage.py", "runserver",]
+COPY ./resources/docker/entrypoint.sh /entrypoint.sh
+
+EXPOSE 8000
+
+ARG DJANGO_SUPERUSER_PASSWORD
+ARG DJANGO_SUPERUSER_EMAIL
+ARG DJANGO_SUPERUSER_USERNAME
+
+ENV DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+ENV DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+ENV DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+
+RUN chmod 777 /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["python", "manage.py", "runserver"]
