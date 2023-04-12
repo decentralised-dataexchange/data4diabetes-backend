@@ -9,6 +9,7 @@ djangorestframework = "*"
 django-constance = "*"
 django-rest-auth = "*"
 psycopg2-binary = "*"
+twilio = "*"
 
 [dev-packages]
 
