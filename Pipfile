@@ -8,6 +8,7 @@ django = "*"
 djangorestframework = "*"
 django-constance = "*"
 django-rest-auth = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
