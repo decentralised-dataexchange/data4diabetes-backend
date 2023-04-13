@@ -11,6 +11,7 @@ django-rest-auth = "*"
 psycopg2-binary = "*"
 twilio = "*"
 django-picklefield = "*"
+gunicorn = "*"
 
 [dev-packages]
 mypy = "*"
