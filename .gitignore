@@ -1,3 +1,5 @@
 .vscode/
 .mypy_cache/
 kubernetes/
+static/
+__pycache__/
