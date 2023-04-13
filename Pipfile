@@ -10,8 +10,10 @@ django-constance = "*"
 django-rest-auth = "*"
 psycopg2-binary = "*"
 twilio = "*"
+django-picklefield = "*"
 
 [dev-packages]
+mypy = "*"
 
 [requires]
 python_version = "3.8"
