@@ -8,7 +8,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: igrant-cluster
-  GKE_ZONE: europe-west3-c
+  GKE_ZONE: europe-west4-c
   DEPLOYMENT_NAME: data4diabetes-staging
   IMAGE: igrant-data4diabetes
 
@@ -58,4 +58,4 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        kubectl set image deployment/$DEPLOYMENT_NAME $DEPLOYMENT_NAME=eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA -n bolagsverket
+        kubectl set image deployment/$DEPLOYMENT_NAME $DEPLOYMENT_NAME=eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA -n data4diabetes
