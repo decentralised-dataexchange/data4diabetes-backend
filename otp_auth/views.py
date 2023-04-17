@@ -87,22 +87,21 @@ def verify_otp(request):
 
             if is_otp_expired_bool:
                 response['data']['msg'] = 'OTP expired'
+            else:
+                user = otp.user
+                token = issue_token(user)
 
-            user = otp.user
-            token = issue_token(user)
-
-            response = {
-                "token": token.key,
-                "user_id": user.username,
-                "firstname": user.firstname,
-                "lastname": user.lastname
-            }
-            return Response(response, status=status.HTTP_200_OK)
-        else:
-            response = {'msg': 'Invalid OTP'}
-    else:
-        response = {'msg': 'Invalid OTP'}
-    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                response = {
+                    'data': {
+                        "token": token.key,
+                        "user_id": user.username,
+                        "firstname": user.firstname,
+                        "lastname": user.lastname
+                    },
+                    'status': status.HTTP_200_OK
+                }
+        return Response(**response)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
