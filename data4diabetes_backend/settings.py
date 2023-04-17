@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'constance',
     'rest_auth',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,6 @@ CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 # CSRF
 CSRF_TRUSTED_ORIGINS = ['https://*.igrant.io','https://*.127.0.0.1']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Authentication
+AUTH_USER_MODEL = 'user.User'
