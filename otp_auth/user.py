@@ -2,10 +2,13 @@ import typing
 import string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
+from django.utils import timezone
 from django.utils.crypto import get_random_string
-from otp_auth.settings import api_settings
+from otp_auth.settings import api_settings, OTP_AUTH_OTP_EXPIRY_IN_MINUTES
 from otp_auth.models import OTP
 from hashlib import sha256
+from datetime import timedelta
+from rest_framework.authtoken.models import Token
 
 
 def generate_otp(max_length: int):
@@ -47,3 +50,29 @@ def send_otp_verification_code(user: AbstractBaseUser) -> None:
         to=user.mobile_number,
         from_=api_settings.TWILIO_FROM_MOBILE_NUMBER
     )
+
+
+def get_otp_by_otp_hash(otp_to_be_verified):
+    """Check if OTP instance is present or not"""
+    try:
+       otp = OTP.objects.get(otp_hash=sha256(otp_to_be_verified.encode('utf-8')).hexdigest())
+       return otp, True
+    except OTP.DoesNotExist:
+        return None, False
+    
+
+def is_otp_expired(otp: OTP) -> bool:
+    """Check if OTP has expired"""
+    otp_created_time = otp.created
+    current_time = timezone.now()
+    otp_expiry_time = otp_created_time + timedelta(minutes=OTP_AUTH_OTP_EXPIRY_IN_MINUTES)
+    if current_time >= otp_expiry_time:
+        return True
+    else:
+        return False
+    
+    
+def issue_token(user) -> Token:
+    """Create Token for the user"""
+    token = Token.objects.create(user=user)
+    return token
