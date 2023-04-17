@@ -22,3 +22,6 @@ class RegisterUserSerializer(serializers.Serializer):
     
 class LoginUserSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(max_length=17)
+
+class VerifyOTPSerializer(serializers.Serializer):
+    otp = serializers.CharField(max_length=6)

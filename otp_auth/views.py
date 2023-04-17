@@ -1,8 +1,15 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from otp_auth.serializers import RegisterUserSerializer, LoginUserSerializer
-from otp_auth.user import get_user_by_mobile_number, is_user_active, send_otp_verification_code
+from otp_auth.serializers import RegisterUserSerializer, LoginUserSerializer, VerifyOTPSerializer
+from otp_auth.user import (
+    get_user_by_mobile_number,
+    is_user_active,
+    send_otp_verification_code,
+    get_otp_by_otp_hash,
+    is_otp_expired,
+    issue_token
+)
 
 
 @api_view(['POST'])
@@ -39,6 +46,7 @@ def register_user(request):
         return Response(response, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 def login_user(request):
     """
@@ -58,4 +66,42 @@ def login_user(request):
         else:
             response = {'msg': 'User does not exists'}
         return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def verify_otp(request):
+    """
+    Verify OTP and create token
+    """
+    serializer = VerifyOTPSerializer(data=request.data)
+    if serializer.is_valid():
+        otp_from_request_body = serializer.validated_data["otp"]
+        otp, is_otp_exists_bool = get_otp_by_otp_hash(otp_from_request_body)
+
+        response = {'data': {'msg': 'Invalid OTP'},
+                    'status': status.HTTP_400_BAD_REQUEST}
+        if is_otp_exists_bool:
+            is_otp_expired_bool = is_otp_expired(otp)
+            if not is_otp_expired_bool:
+                user = otp.user
+
+                if not user.is_active:
+                    # update user to active
+                    user.is_active = True
+                    user.save()
+
+                # issue token for the user
+                token = issue_token(user)
+
+                response = {
+                    'data': {
+                        "token": token.key,
+                        "user_id": user.id,
+                        "firstname": user.firstname,
+                        "lastname": user.lastname
+                    },
+                    'status': status.HTTP_200_OK
+                }
+        return Response(**response)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

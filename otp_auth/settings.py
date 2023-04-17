@@ -11,4 +11,6 @@ DEFAULTS = {
     'OTP_MESSAGE_TEMPLATE': 'Use this OTP to securely log in: %s'
 }
 
+OTP_AUTH_OTP_EXPIRY_IN_MINUTES = 15
+
 api_settings = APISettings(USER_SETTINGS, DEFAULTS)
