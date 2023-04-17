@@ -19,3 +19,6 @@ class RegisterUserSerializer(serializers.Serializer):
         user.set_unusable_password()
         user.save()
         return user
+    
+class LoginUserSerializer(serializers.Serializer):
+    mobile_number = serializers.CharField(max_length=17)

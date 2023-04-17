@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from otp_auth.serializers import RegisterUserSerializer
+from otp_auth.serializers import RegisterUserSerializer, LoginUserSerializer
 from otp_auth.user import get_user_by_mobile_number, is_user_active, send_otp_verification_code
 
 
@@ -37,4 +37,25 @@ def register_user(request):
 
         response = {'msg': 'OTP sent'}
         return Response(response, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def login_user(request):
+    """
+    Login a user and send OTP for verification
+    """
+    serializer = LoginUserSerializer(data=request.data)
+    if serializer.is_valid():
+        user, is_user_exists_bool = get_user_by_mobile_number(
+            serializer.validated_data["mobile_number"])
+        is_user_active_bool = is_user_active(user)
+
+        if (is_user_exists_bool and is_user_active_bool):
+            # send otp verification code
+            send_otp_verification_code(user)
+            response = {'msg': 'OTP send'}
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response = {'msg': 'User does not exists'}
+        return Response(response, status=status.HTTP_401_UNAUTHORIZED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
