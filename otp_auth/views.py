@@ -1,5 +1,5 @@
-from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework import status, authentication
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 from otp_auth.serializers import RegisterUserSerializer, LoginUserSerializer, VerifyOTPSerializer
 from otp_auth.user import (
@@ -8,7 +8,8 @@ from otp_auth.user import (
     send_otp_verification_code,
     get_otp_by_otp_hash,
     is_otp_expired,
-    issue_token
+    issue_token,
+    delete_token
 )
 
 
@@ -83,25 +84,29 @@ def verify_otp(request):
                     'status': status.HTTP_400_BAD_REQUEST}
         if is_otp_exists_bool:
             is_otp_expired_bool = is_otp_expired(otp)
-            if not is_otp_expired_bool:
-                user = otp.user
 
-                if not user.is_active:
-                    # update user to active
-                    user.is_active = True
-                    user.save()
+            if is_otp_expired_bool:
+                response['data']['msg'] = 'OTP expired'
 
-                # issue token for the user
-                token = issue_token(user)
+            user = otp.user
+            token = issue_token(user)
 
-                response = {
-                    'data': {
-                        "token": token.key,
-                        "user_id": user.id,
-                        "firstname": user.firstname,
-                        "lastname": user.lastname
-                    },
-                    'status': status.HTTP_200_OK
-                }
-        return Response(**response)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "token": token.key,
+                "user_id": user.username,
+                "firstname": user.firstname,
+                "lastname": user.lastname
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response = {'msg': 'Invalid OTP'}
+    else:
+        response = {'msg': 'Invalid OTP'}
+    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@authentication_classes([authentication.TokenAuthentication])
+def logout_user(request):
+    delete_token(request.user)
+    return Response(status=status.HTTP_204_NO_CONTENT)

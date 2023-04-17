@@ -76,3 +76,10 @@ def issue_token(user) -> Token:
     """Create Token for the user"""
     token = Token.objects.create(user=user)
     return token
+
+
+def delete_token(user: AbstractBaseUser):
+    """Delete Token of the user"""
+    user.auth_token.delete()
+    user.save()
+    return
