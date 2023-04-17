@@ -9,6 +9,8 @@ class UserAccountManager(BaseUserManager):
     def create_superuser(self,
                          username: typing.Union[str, None] = None,
                          mobile_number: typing.Union[str, None] = None,
+                         firstname: typing.Union[str, None] = None,
+                         lastname: typing.Union[str, None] = None,
                          password: typing.Union[str, None] = None,
                          **other_fields):
         other_fields.setdefault('is_staff', True)
@@ -21,7 +23,7 @@ class UserAccountManager(BaseUserManager):
         if other_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must be assigned to is_superuser=True')
         user = self.create_user(
-            username, mobile_number, password, **other_fields)
+            username, mobile_number, firstname, lastname, password, **other_fields)
         user.set_password(password)
         user.save()
         return user
@@ -29,15 +31,25 @@ class UserAccountManager(BaseUserManager):
     def create_user(self,
                     username: typing.Union[str, None] = None,
                     mobile_number: typing.Union[str, None] = None,
+                    firstname: typing.Union[str, None] = None,
+                    lastname: typing.Union[str, None] = None,
                     password: typing.Union[str, None] = None,
                     **other_fields):
         if password is not None:
-            user = self.model(
-                username=username, mobile_number=mobile_number, password=password, **other_fields)
+            user = self.model(username=username,
+                              mobile_number=mobile_number,
+                              firstname=firstname,
+                              lastname=lastname,
+                              password=password,
+                              **other_fields)
             user.save()
         else:
-            user = self.model(
-                username=username, mobile_number=mobile_number, password=password, **other_fields)
+            user = self.model(username=username,
+                              mobile_number=mobile_number,
+                              firstname=firstname,
+                              lastname=lastname,
+                              password=password,
+                              **other_fields)
             user.set_unusable_password()
             user.save()
 
@@ -51,6 +63,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         regex=r'^\+?1?\d{9,15}$', message="Please enter a valid mobile number")
     mobile_number = models.CharField(
         validators=[mobile_regex], max_length=17, blank=True, null=True)
+    firstname = models.CharField(max_length=20, blank=True, null=True)
+    lastname = models.CharField(max_length=20, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
