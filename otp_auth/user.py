@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from otp_auth.settings import api_settings, OTP_AUTH_OTP_EXPIRY_IN_MINUTES
+from otp_auth.settings import api_settings
 from otp_auth.models import OTP
 from hashlib import sha256
 from datetime import timedelta
@@ -65,7 +65,7 @@ def is_otp_expired(otp: OTP) -> bool:
     """Check if OTP has expired"""
     otp_created_time = otp.created
     current_time = timezone.now()
-    otp_expiry_time = otp_created_time + timedelta(minutes=OTP_AUTH_OTP_EXPIRY_IN_MINUTES)
+    otp_expiry_time = otp_created_time + timedelta(minutes=api_settings.OTP_EXPIRY_IN_MINUTES)
     if current_time >= otp_expiry_time:
         return True
     else:
