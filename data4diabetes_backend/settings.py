@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'constance',
     'rest_auth',
-    'user'
+    'user',
+    'otp_auth'
 ]
 
 MIDDLEWARE = [
@@ -132,7 +133,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'https://storage.googleapis.com/data4diabetes/static/' if os.environ.get("ENV") == "prod" else 'static/'
+STATIC_URL = 'https://storage.googleapis.com/data4diabetes/static/' if os.environ.get(
+    "ENV") == "prod" else 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -143,8 +145,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 # CSRF
-CSRF_TRUSTED_ORIGINS = ['https://*.igrant.io','https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://*.igrant.io', 'https://*.127.0.0.1']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Authentication
 AUTH_USER_MODEL = 'user.User'
+
+# OTP based authentication
+OTP_AUTH = {
+    'TWILIO_FROM_MOBILE_NUMBER': os.environ['TWILIO_FROM_MOBILE_NUMBER'],
+    'TWILIO_ACCOUNT_SID': os.environ['TWILIO_ACCOUNT_SID'],
+    'TWILIO_AUTH_TOKEN': os.environ['TWILIO_AUTH_TOKEN'],
+    'OTP_MESSAGE_TEMPLATE': 'Use this OTP to securely log in: %s'
+}
