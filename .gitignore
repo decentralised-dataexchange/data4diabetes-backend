@@ -3,3 +3,4 @@
 kubernetes/
 static/
 __pycache__/
+db.sqlite3
