@@ -18,6 +18,14 @@ Run the following command to install the dependencies to current virtual environ
 pipenv sync
 ```
 
+Create `.env` file with following content:
+
+```bash
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_FROM_MOBILE_NUMBER=
+```
+
 ## Docker
 
 Run the following command to run the project using docker-compose.
