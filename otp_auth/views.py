@@ -89,6 +89,9 @@ def verify_otp(request):
                 response['data']['msg'] = 'OTP expired'
             else:
                 user = otp.user
+                if not user.is_active:
+                    user.is_active = True
+                    user.save()
                 token = issue_token(user)
 
                 response = {

@@ -74,7 +74,7 @@ def is_otp_expired(otp: OTP) -> bool:
     
 def issue_token(user) -> Token:
     """Create Token for the user"""
-    token = Token.objects.create(user=user)
+    token, created = Token.objects.get_or_create(user=user)
     return token
 
 
