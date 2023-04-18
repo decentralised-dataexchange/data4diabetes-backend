@@ -9,7 +9,8 @@ from otp_auth.user import (
     get_otp_by_otp_hash,
     is_otp_expired,
     issue_token,
-    delete_token
+    delete_token,
+    delete_otp
 )
 
 
@@ -93,7 +94,9 @@ def verify_otp(request):
                     user.is_active = True
                     user.save()
                 token = issue_token(user)
-
+                
+                delete_otp(user)
+            
                 response = {
                     'data': {
                         "token": token.key,
