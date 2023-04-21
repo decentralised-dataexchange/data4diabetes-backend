@@ -9,7 +9,9 @@ DEFAULTS = {
     'TWILIO_ACCOUNT_SID': None,
     'TWILIO_AUTH_TOKEN': None,
     'OTP_MESSAGE_TEMPLATE': 'Use this OTP to securely log in: %s',
-    'OTP_EXPIRY_IN_MINUTES': 15
+    'OTP_EXPIRY_IN_MINUTES': 15,
+    'TEST_MOBILE_NUMBER': None,
+    'TEST_OTP': None
 }
 
 api_settings = APISettings(USER_SETTINGS, DEFAULTS)
