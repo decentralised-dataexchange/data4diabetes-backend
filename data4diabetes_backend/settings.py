@@ -156,5 +156,7 @@ OTP_AUTH = {
     'TWILIO_FROM_MOBILE_NUMBER': os.environ['TWILIO_FROM_MOBILE_NUMBER'],
     'TWILIO_ACCOUNT_SID': os.environ['TWILIO_ACCOUNT_SID'],
     'TWILIO_AUTH_TOKEN': os.environ['TWILIO_AUTH_TOKEN'],
-    'OTP_MESSAGE_TEMPLATE': 'Use this OTP to securely log in: %s'
+    'OTP_MESSAGE_TEMPLATE': 'Use this OTP to securely log in: %s',
+    'TEST_MOBILE_NUMBER': os.environ['TEST_MOBILE_NUMBER'],
+    'TEST_OTP': os.environ['TEST_OTP']
 }

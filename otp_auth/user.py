@@ -39,7 +39,8 @@ def send_otp_verification_code(user: AbstractBaseUser) -> None:
     twilio_client = Client(api_settings.TWILIO_ACCOUNT_SID,
                            api_settings.TWILIO_AUTH_TOKEN)
 
-    otp = generate_otp(6)
+    # Check the user mobile number and use static otp
+    otp = api_settings.TEST_OTP if user.mobile_number == api_settings.TEST_MOBILE_NUMBER else generate_otp(6)
 
     # Save OTP to database.
     OTP.objects.create(user=user, otp_hash=sha256(
