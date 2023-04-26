@@ -91,12 +91,15 @@ def verify_otp(request):
     delete_otp(user)
 
     response_data = {
-        "token": token.key,
-        "user_id": user.username,
-        "firstname": user.firstname,
-        "lastname": user.lastname
+        'data': {
+            "token": token.key,
+            "user_id": user.username,
+            "firstname": user.firstname,
+            "lastname": user.lastname
+        },
+        'status': status.HTTP_200_OK
     }
-    return Response({'data': response_data, 'status': status.HTTP_200_OK})
+    return Response(**response_data)
 
 
 @api_view(['POST'])
