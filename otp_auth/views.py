@@ -55,20 +55,20 @@ def login_user(request):
     Login a user and send OTP for verification
     """
     serializer = LoginUserSerializer(data=request.data)
-    if serializer.is_valid():
-        user, is_user_exists_bool = get_user_by_mobile_number(
-            serializer.validated_data["mobile_number"])
-        is_user_active_bool = is_user_active(user)
+    serializer.is_valid(raise_exception=True)
+    mobile_number = serializer.validated_data["mobile_number"]
+    user, is_user_exists_bool = get_user_by_mobile_number(mobile_number)
 
-        if (is_user_exists_bool and is_user_active_bool):
-            # send otp verification code
-            send_otp_verification_code(user)
-            response = {'msg': 'OTP send'}
-            return Response(response, status=status.HTTP_200_OK)
-        else:
-            response = {'msg': 'User does not exists'}
-        return Response(response, status=status.HTTP_401_UNAUTHORIZED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if not is_user_exists_bool:
+        return Response({'msg': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not is_user_active(user):
+        return Response({'msg': 'User is not active'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # send OTP verification code
+    send_otp_verification_code(user)
+    response_data = {'msg': 'OTP sent'}
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
