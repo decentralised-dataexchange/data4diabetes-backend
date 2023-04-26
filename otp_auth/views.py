@@ -77,37 +77,31 @@ def verify_otp(request):
     Verify OTP and create token
     """
     serializer = VerifyOTPSerializer(data=request.data)
-    if serializer.is_valid():
-        otp_from_request_body = serializer.validated_data["otp"]
-        otp, is_otp_exists_bool = get_otp_by_otp_hash(otp_from_request_body)
+    serializer.is_valid(raise_exception=True)
+    otp_from_request_body = serializer.validated_data["otp"]
+    otp, is_otp_exists_bool = get_otp_by_otp_hash(otp_from_request_body)
 
-        response = {'data': {'msg': 'Invalid OTP'},
-                    'status': status.HTTP_400_BAD_REQUEST}
-        if is_otp_exists_bool:
-            is_otp_expired_bool = is_otp_expired(otp)
+    if not is_otp_exists_bool:
+        return Response({'data': {'msg': 'Invalid OTP'}, 'status': status.HTTP_400_BAD_REQUEST})
 
-            if is_otp_expired_bool:
-                response['data']['msg'] = 'OTP expired'
-            else:
-                user = otp.user
-                if not user.is_active:
-                    user.is_active = True
-                    user.save()
-                token = issue_token(user)
-                
-                delete_otp(user)
-            
-                response = {
-                    'data': {
-                        "token": token.key,
-                        "user_id": user.username,
-                        "firstname": user.firstname,
-                        "lastname": user.lastname
-                    },
-                    'status': status.HTTP_200_OK
-                }
-        return Response(**response)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if is_otp_expired(otp):
+        return Response({'data': {'msg': 'OTP expired'}, 'status': status.HTTP_400_BAD_REQUEST})
+
+    user = otp.user
+    if not user.is_active:
+        user.is_active = True
+        user.save()
+
+    token = issue_token(user)
+    delete_otp(user)
+
+    response_data = {
+        "token": token.key,
+        "user_id": user.username,
+        "firstname": user.firstname,
+        "lastname": user.lastname
+    }
+    return Response({'data': response_data, 'status': status.HTTP_200_OK})
 
 
 @api_view(['POST'])
