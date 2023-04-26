@@ -20,33 +20,28 @@ def register_user(request):
     Register a user and send OTP for verification
     """
     serializer = RegisterUserSerializer(data=request.data)
-    if serializer.is_valid():
-        user, is_user_exists_bool = get_user_by_mobile_number(
-            serializer.validated_data["mobile_number"])
-        is_user_active_bool = is_user_active(user)
+    serializer.is_valid(raise_exception=True)
+    mobile_number = serializer.validated_data["mobile_number"]
+    user, is_user_exists_bool = get_user_by_mobile_number(mobile_number)
 
-        if is_user_exists_bool:
-            if is_user_active_bool:
-                response = {'msg': 'User exists'}
-                return Response(response, status=status.HTTP_409_CONFLICT)
-            else:
-                # update user firstname and lastname
-                user.firstname = serializer.validated_data["firstname"]
-                user.lastname = serializer.validated_data["lastname"]
-                user.save()
-
-                # send otp verification code
-                send_otp_verification_code(user)
+    if is_user_exists_bool:
+        if is_user_active(user):
+            response_data = {'msg': 'User already exists and is active'}
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
         else:
-            # create a user
-            user = serializer.save()
+            # update user firstname and lastname
+            user.firstname = serializer.validated_data["firstname"]
+            user.lastname = serializer.validated_data["lastname"]
+            user.save()
+    else:
+        # create a user
+        user = serializer.save()
 
-            # send otp verification code
-            send_otp_verification_code(user)
+    # send OTP verification code
+    send_otp_verification_code(user)
 
-        response = {'msg': 'OTP sent'}
-        return Response(response, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    response_data = {'msg': 'OTP sent'}
+    return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
