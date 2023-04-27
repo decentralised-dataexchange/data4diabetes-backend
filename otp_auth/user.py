@@ -43,7 +43,7 @@ def send_otp_verification_code(user: AbstractBaseUser) -> None:
     otp = api_settings.TEST_OTP if user.mobile_number == api_settings.TEST_MOBILE_NUMBER else generate_otp(6)
 
     # Delete previous OTP from database
-    OTP.objects.filter(user=user).delete()
+    delete_otp(user)
 
     # Save OTP to database.
     OTP.objects.create(user=user, otp_hash=sha256(
