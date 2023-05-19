@@ -126,5 +126,6 @@ def validate_mobile_number(request):
 @api_view(['POST'])
 @authentication_classes([authentication.TokenAuthentication])
 def delete_user_account(request):
-    delete_user(request.user)
+    token = request.headers.get("Authorization").split("Bearer Token ")[1]
+    delete_user(token)
     return Response(status=status.HTTP_204_NO_CONTENT)
