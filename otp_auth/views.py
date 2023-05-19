@@ -1,7 +1,12 @@
 from rest_framework import status, authentication
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
-from otp_auth.serializers import RegisterUserSerializer, LoginUserSerializer, VerifyOTPSerializer
+from otp_auth.serializers import (
+    RegisterUserSerializer, 
+    LoginUserSerializer, 
+    VerifyOTPSerializer,
+    ValidateMobileNumberSerializer
+)
 from otp_auth.user import (
     get_user_by_mobile_number,
     is_user_active,
@@ -107,3 +112,12 @@ def verify_otp(request):
 def logout_user(request):
     delete_token(request.user)
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def validate_mobile_number(request):
+    serializer = ValidateMobileNumberSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    mobile_number = serializer.validated_data["mobile_number"]
+    _, is_user_exists_bool = get_user_by_mobile_number(mobile_number)
+    response_data = {'is_valid_mobile_number': is_user_exists_bool}
+    return Response(response_data, status=status.HTTP_200_OK)
