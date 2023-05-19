@@ -15,7 +15,8 @@ from otp_auth.user import (
     is_otp_expired,
     issue_token,
     delete_token,
-    delete_otp
+    delete_otp,
+    delete_user
 )
 
 
@@ -121,3 +122,9 @@ def validate_mobile_number(request):
     _, is_user_exists_bool = get_user_by_mobile_number(mobile_number)
     response_data = {'is_valid_mobile_number': is_user_exists_bool}
     return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes([authentication.TokenAuthentication])
+def delete_user_account(request):
+    delete_user(request.user)
+    return Response(status=status.HTTP_204_NO_CONTENT)

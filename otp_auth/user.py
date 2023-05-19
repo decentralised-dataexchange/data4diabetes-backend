@@ -92,3 +92,9 @@ def delete_token(user: AbstractBaseUser):
 def delete_otp(user: AbstractBaseUser):
     """Delete OTP of the user"""
     OTP.objects.filter(user=user).delete()
+
+def delete_user(user: AbstractBaseUser):
+    """Delete user"""
+    user.delete()
+    return
+
