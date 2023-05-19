@@ -127,5 +127,9 @@ def validate_mobile_number(request):
 @authentication_classes([authentication.TokenAuthentication])
 def delete_user_account(request):
     token = request.headers.get("Authorization").split("Bearer Token ")[1]
-    delete_user(token)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    is_deleted = delete_user(token)
+    if is_deleted:
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    else:
+        response_data = {'msg': 'User does not exist'}
+        return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
