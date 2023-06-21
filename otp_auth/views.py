@@ -7,6 +7,7 @@ from otp_auth.serializers import (
     VerifyOTPSerializer,
     ValidateMobileNumberSerializer
 )
+from twilio.base.exceptions import TwilioRestException
 from otp_auth.user import (
     get_user_by_mobile_number,
     is_user_active,
@@ -44,7 +45,11 @@ def register_user(request):
         user = serializer.save()
 
     # send OTP verification code
-    send_otp_verification_code(user)
+    try:
+        send_otp_verification_code(user)
+    except TwilioRestException as e:
+        response_data = {'msg': 'Failed to send OTP verification code'}
+        return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
     response_data = {'msg': 'OTP sent'}
     return Response(response_data, status=status.HTTP_201_CREATED)
@@ -67,7 +72,11 @@ def login_user(request):
         return Response({'msg': 'User is not active'}, status=status.HTTP_401_UNAUTHORIZED)
 
     # send OTP verification code
-    send_otp_verification_code(user)
+    try:
+        send_otp_verification_code(user)
+    except TwilioRestException as e:
+        response_data = {'msg': 'Failed to send OTP verification code'}
+        return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
     response_data = {'msg': 'OTP sent'}
     return Response(response_data, status=status.HTTP_200_OK)
 
