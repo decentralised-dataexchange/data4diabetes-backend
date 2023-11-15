@@ -64,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     mobile_number = models.CharField(
         validators=[mobile_regex], max_length=17, blank=True, null=True)
     firstname = models.CharField(max_length=20, blank=True, null=True)
-    lastname = models.CharField(max_length=20, blank=True, null=True)
+    lastname = models.CharField(max_length=512, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
