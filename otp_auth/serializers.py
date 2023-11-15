@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 class RegisterUserSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(max_length=17)
     firstname = serializers.CharField(max_length=20)
-    lastname = serializers.CharField(max_length=20)
+    lastname = serializers.CharField(max_length=512)
 
     def create(self, validated_data):
         """
