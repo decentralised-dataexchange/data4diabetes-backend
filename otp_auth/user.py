@@ -1,14 +1,16 @@
-import typing
 import string
+import typing
+from datetime import timedelta
+from hashlib import sha256
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from otp_auth.settings import api_settings
-from otp_auth.models import OTP
-from hashlib import sha256
-from datetime import timedelta
 from rest_framework.authtoken.models import Token
+
+from otp_auth.models import OTP
+from otp_auth.settings import api_settings
 
 
 def generate_otp(max_length: int):
@@ -93,12 +95,14 @@ def delete_otp(user: AbstractBaseUser):
     """Delete OTP of the user"""
     OTP.objects.filter(user=user).delete()
 
-def delete_user(token: str) -> bool:
+def delete_user(mobile_number: str) -> bool:
     """Delete user"""
     try:
-        user = Token.objects.get(key=token).user
-        user.delete()
-        return True
+        user, exists = get_user_by_mobile_number(mobile_number)
+        if exists:
+            user.delete()
+            return True
+        return False
     except Token.DoesNotExist:
         return False
 

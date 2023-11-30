@@ -1,24 +1,15 @@
-from rest_framework import status, authentication
+from rest_framework import authentication, status
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
-from otp_auth.serializers import (
-    RegisterUserSerializer, 
-    LoginUserSerializer, 
-    VerifyOTPSerializer,
-    ValidateMobileNumberSerializer
-)
 from twilio.base.exceptions import TwilioRestException
-from otp_auth.user import (
-    get_user_by_mobile_number,
-    is_user_active,
-    send_otp_verification_code,
-    get_otp_by_otp_hash,
-    is_otp_expired,
-    issue_token,
-    delete_token,
-    delete_otp,
-    delete_user
-)
+
+from otp_auth.serializers import (LoginUserSerializer, RegisterUserSerializer,
+                                  ValidateMobileNumberSerializer,
+                                  VerifyOTPSerializer)
+from otp_auth.user import (delete_otp, delete_token, delete_user,
+                           get_otp_by_otp_hash, get_user_by_mobile_number,
+                           is_otp_expired, is_user_active, issue_token,
+                           send_otp_verification_code)
 
 
 @api_view(['POST'])
@@ -133,10 +124,8 @@ def validate_mobile_number(request):
     return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@authentication_classes([authentication.TokenAuthentication])
 def delete_user_account(request):
-    token = request.headers.get("Authorization").split("Bearer Token ")[1]
-    is_deleted = delete_user(token)
+    is_deleted = delete_user(request.data.get("mobile_number"))
     if is_deleted:
         return Response(status=status.HTTP_204_NO_CONTENT)
     else:
