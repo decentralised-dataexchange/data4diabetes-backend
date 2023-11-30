@@ -24,7 +24,7 @@ def get_user_by_mobile_number(mobile_number: str) -> typing.Tuple[AbstractBaseUs
     """Query `User` instance by mobile number and return the `User` instance, existence boolean"""
     User = get_user_model()
     try:
-        user = User.objects.get(username=mobile_number)
+        user = User.objects.get(mobile_number=mobile_number)
         return user, True
     except User.DoesNotExist:
         return None, False
