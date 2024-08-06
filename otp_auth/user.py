@@ -51,11 +51,12 @@ def send_otp_verification_code(user: AbstractBaseUser) -> None:
     OTP.objects.create(user=user, otp_hash=sha256(
         otp.encode('utf-8')).hexdigest())
 
-    twilio_client.messages.create(
-        body=api_settings.OTP_MESSAGE_TEMPLATE % otp,
-        to=user.mobile_number,
-        from_=api_settings.TWILIO_FROM_MOBILE_NUMBER
-    )
+    if user.mobile_number != api_settings.TEST_MOBILE_NUMBER:
+        twilio_client.messages.create(
+            body=api_settings.OTP_MESSAGE_TEMPLATE % otp,
+            to=user.mobile_number,
+            from_=api_settings.TWILIO_FROM_MOBILE_NUMBER
+        )
 
 
 def get_otp_by_otp_hash(otp_to_be_verified):
